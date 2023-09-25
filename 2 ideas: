@@ -3,4 +3,6 @@
 Idea 1: Use Google Canlender as API to get users' schedule and 
 compare and find free time intervals from selected users. Then use Yelp as another API. The user will also need to manually input the palce they want go to find some activities or events like exhibitions or restaurants by searching on Yelp so they can get a recommendations when everyone has free time and have some fun.
 
-Idea 2:
+Idea 2: Use weather app as API to get current weather data and use Amazon or some other stores to get recommended clothing based on the weather.
+
+Idea 3:
