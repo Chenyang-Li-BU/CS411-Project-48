@@ -2,6 +2,7 @@
 session_start();
 $la=unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$_SERVER['REMOTE_ADDR']))['geoplugin_latitude'];
 $lo=unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$_SERVER['REMOTE_ADDR']))['geoplugin_longitude'];
+
 include('conn.php');
 $end_point = 'https://accounts.google.com/o/oauth2/v2/auth';
 $client_id = '1028429234083-qrqd0gigmrctl2jgi9iequms2l3olb1v.apps.googleusercontent.com';
@@ -58,6 +59,7 @@ $row=mysqli_fetch_assoc($rs);
 
 
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <title>Weather</title>
@@ -89,6 +91,43 @@ $row=mysqli_fetch_assoc($rs);
 <!-- banner-bottom-plugin -->
 <link href="css/owl.carousel.css" rel="stylesheet" type="text/css" media="all">
 <script src="js/owl.carousel.js"></script>
+<style>
+	/* 
+ * Always set the map height explicitly to define the size of the div element
+ * that contains the map. 
+ */
+
+
+#floating-panel {
+  position: absolute;
+  top: 10px;
+  left: 25%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  font-family: "Roboto", "sans-serif";
+  line-height: 30px;
+  padding-left: 10px;
+}
+
+#floating-panel {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  margin-left: -180px;
+  width: 350px;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+}
+
+#latlng {
+  width: 225px;
+}
+</style>
 <script>
 	$(document).ready(function() { 
 		$("#owl-demo").owlCarousel({
@@ -235,9 +274,9 @@ $row=mysqli_fetch_assoc($rs);
 							<div class="agile_tv_series_grid">
 								<div class="col-md-6 agile_tv_series_grid_left">
 									<div class="w3ls_market_video_grid1">
-										<img src="images/h1-1.jpg" alt=" " class="img-responsive" style="height:312px"/>
+									  <div id="map" style="width:285px;width:530px"></div>
 										<a class="w3_play_icon" href="#small-dialog">
-											<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
+											
 										</a>
 									</div>
 								</div>
@@ -312,6 +351,10 @@ $row=mysqli_fetch_assoc($rs);
 		</div>
 	</div>
 <script src="js/bootstrap.min.js"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAI-qkRxct884yUNl8yd8J8HnaHY_YGj64&callback=initMap&v=weekly"
+      defer
+    ></script>
 <script>
 $(document).ready(function(){
     $(".dropdown").hover(            
@@ -330,6 +373,48 @@ $(document).ready(function(){
 		$(document).ready(function() {	
 			$().UItoTop({ easingType: 'easeOutQuart' });				
 			});
+			function initMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: { lat: <?php echo $la;?>, lng: <?php echo $lo;?>},
+  });
+  const geocoder = new google.maps.Geocoder();
+  const infowindow = new google.maps.InfoWindow();
+
+  
+    geocodeLatLng(geocoder, map, infowindow);
+
+}
+
+function geocodeLatLng(geocoder, map, infowindow) {
+  const input = '<?php echo $la.','.$lo;?>';
+  const latlngStr = input.split(",", 2);
+  const latlng = {
+    lat: parseFloat(latlngStr[0]),
+    lng: parseFloat(latlngStr[1]),
+  };
+
+  geocoder
+    .geocode({ location: latlng })
+    .then((response) => {
+      if (response.results[0]) {
+        map.setZoom(11);
+
+        const marker = new google.maps.Marker({
+          position: latlng,
+          map: map,
+        });
+
+        infowindow.setContent(response.results[0].formatted_address);
+        infowindow.open(map, marker);
+      } else {
+        window.alert("No results found");
+      }
+    })
+    .catch((e) => window.alert("Geocoder failed due to: " + e));
+}
+
+window.initMap = initMap;
 	</script>
 </body>
 </html>
